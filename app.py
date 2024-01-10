@@ -32,4 +32,12 @@ if st.button("Send"):
         messages.append({"role": "user", "content": user_input})
         assistant_response = generate_openai_response(messages)
         messages.append({"role": "assistant", "content": assistant_response})
-        st.text("Assistant: " + assistant_response)
+
+# Display chat history
+for message in messages:
+    role = message["role"]
+    content = message["content"]
+    if role == "user":
+        st.text(f"You: {content}")
+    elif role == "assistant":
+        st.text(f"Assistant: {content}")
