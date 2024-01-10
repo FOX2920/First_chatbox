@@ -15,11 +15,12 @@ user_input = st.text_input("You:", "")
 # Model selection dropdown
 selected_model = st.selectbox("Select Model:", ["gpt-35-turbo", "gpt-35-turbo-16k", "text-embedding-ada-002"])
 
+# Retrieve chat history from session state
+messages = st.session_state.get("messages", [])
+
 # Clear chat history button
 if st.button("Clear Chat"):
     messages = []
-else:
-    messages = st.session_state.get("messages", [])
 
 # Send message button
 if st.button("Send"):
