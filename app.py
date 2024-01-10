@@ -26,12 +26,19 @@ st.title("Azure OpenAI Chatbox")
 
 messages = []
 
+# User input
 user_input = st.text_input("You:", "")
+
+# Clear chat history button
+if st.button("Clear Chat"):
+    messages = []
+
 if st.button("Send"):
     if user_input:
         messages.append({"role": "user", "content": user_input})
         assistant_response = generate_openai_response(messages)
-        messages.append({"role": "assistant", "content": assistant_response})
+        if assistant_response:
+            messages.append({"role": "assistant", "content": assistant_response})
 
 # Display chat history
 for message in messages:
