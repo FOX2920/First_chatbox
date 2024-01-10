@@ -47,4 +47,4 @@ for message in messages:
     if role == "user":
         st.text(f"You: {content}")
     elif role == "assistant":
-        st.text(f"Assistant: {content}")
+        st.write(f"Assistant: {content}")
