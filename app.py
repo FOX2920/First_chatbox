@@ -1,65 +1,45 @@
+import os
 import streamlit as st
 from openai import AzureOpenAI
-from datetime import datetime
 
-# Initialize Azure OpenAI client (replace with your actual values)
+st.title("Chatbox with Azure OpenAI")
+
+# Initialize AzureOpenAI client
 client = AzureOpenAI(
-    azure_endpoint="https://sunhackathon31.openai.azure.com/",
-    api_key="9a81322a075f48acb8b612d3e38f6bc1",
+    azure_endpoint=os.getenv("https://sunhackathon31.openai.azure.com/"),
+    api_key=os.getenv("9a81322a075f48acb8b612d3e38f6bc1"),
     api_version="2023-05-15"
 )
 
-def main():
-    st.title("Chatbox with Azure OpenAI")
+# Function to generate AI response
+def generate_response(messages):
+    response = client.chat.completions.create(
+        model="GPT35TURBO",
+        messages=messages
+    )
+    return response.choices[0].message.content
 
-    # Initialize or retrieve conversation history from session state
-    conversation_history = st.session_state.get("conversation_history", [])
-
-    # Create a text input for user messages
-    user_input = st.text_input("You:", "")
-
-    # Check if the user has entered any message
-    if st.button("Send") and user_input:
-        # Append user message to conversation history
-        conversation_history.append({
-            "role": "user",
-            "message": user_input,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        })
-
-        # Call the OpenAI API to generate a response
-        response = generate_openai_response(user_input)
-
-        # Append AI response to conversation history
-        conversation_history.append({
-            "role": "ai",
-            "message": response,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        })
-
-        # Display the conversation history
-        display_conversation_history(conversation_history)
-
-    # Save conversation history to session state
-    st.session_state.conversation_history = conversation_history
-
-    # Button to clear the conversation history
-    if st.button("Clear Conversation"):
-        st.session_state.conversation_history = []
-
-def generate_openai_response(user_input):
-    # Call the OpenAI API to generate a response
-    response = client.complete_prompt(prompt=user_input, temperature=0.7, max_tokens=100)
-
-    # Extract the generated text from the response
-    generated_text = response["choices"][0]["text"].strip()
-
-    return generated_text
-
-def display_conversation_history(conversation_history):
-    # Display the conversation history with timestamps
-    for entry in conversation_history:
-        st.text(f"{entry['timestamp']} - {entry['role'].capitalize()}: {entry['message']}")
-
+# Main Streamlit app
 if __name__ == "__main__":
-    main()
+    messages = []
+
+    while True:
+        user_input = st.text_input("You:", key="user_input")
+        if user_input:
+            messages.append({"role": "user", "content": user_input})
+
+            # Generate AI response
+            assistant_response = generate_response(messages)
+            messages.append({"role": "assistant", "content": assistant_response})
+
+            # Display conversation in the chatbox
+            for message in messages:
+                if message["role"] == "user":
+                    st.text_input("You:", message["content"], key=f"user_{len(messages)}")
+                elif message["role"] == "assistant":
+                    st.text_input("Assistant:", message["content"], key=f"assistant_{len(messages)}")
+
+            # Clear user input after processing
+            st.text_input("You:", key="user_input", value="")
+
+        st.sleep(1)  # Sleep for a second to control the rate of requests
