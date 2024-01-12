@@ -42,6 +42,8 @@ if st.button("Generate Story"):
         if assistant_response:
             st.write(f"Story: {assistant_response}")
 
+            # Clear other elements in the UI
+            st.text("")  # Add an empty text element to separate story from other content
 
 
 # Clear chat history button
