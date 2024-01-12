@@ -1,6 +1,6 @@
 import streamlit as st
 from openai import AzureOpenAI
-from cjklib.characterlookup import CharacterLookup
+from unihan_etl import Unihan
 
 # Replace with your provided Azure OpenAI credentials
 azure_endpoint = "https://sunhackathon31.openai.azure.com/"
@@ -16,6 +16,16 @@ user_input = st.text_input("Kanji:", "")
 # Model selection dropdown
 selected_model = st.selectbox("Select Model:", ["gpt-35-turbo", "gpt-35-turbo-16k", "text-embedding-ada-002"])
 
+# Function to extract radicals using unihan-etl
+def get_radicals(character):
+    try:
+        u = Unihan()
+        radicals = u.get_glyphs(character).get("kIRG_GSource")
+        return ", ".join(radicals) if radicals else character
+    except Exception as e:
+        st.warning(f"Error extracting radicals: {e}")
+        return character
+
 # Generate a 10-word story with words related to the provided Kanji character
 if st.button("Generate Story"):
     if user_input:
@@ -25,10 +35,8 @@ if st.button("Generate Story"):
             api_version=api_version
         )
 
-        # Fetch radicals using cjklib
-        lookup = CharacterLookup('C')
-        radicals = lookup.getRadicalStrokeCount(user_input)
-        radicals_str = ', '.join(radicals) if radicals else user_input
+        # Fetch radicals using unihan-etl
+        radicals_str = get_radicals(user_input)
 
         # Choose the appropriate model based on user selection
         if selected_model == "gpt-35-turbo":
