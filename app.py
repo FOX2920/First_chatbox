@@ -9,13 +9,13 @@ api_version = "2023-05-15"
 # Streamlit UI
 st.title("Azure OpenAI Chatbox")
 
-# User input
-user_input = st.text_input("You:", "")
+# User input for Kanji character
+user_input = st.text_input("Kanji:", "")
 
 # Model selection dropdown
 selected_model = st.selectbox("Select Model:", ["gpt-35-turbo", "gpt-35-turbo-16k", "text-embedding-ada-002"])
 
-# Generate a 10-word story with the specified keyword
+# Generate a 10-word story with words related to the provided Kanji character and its radicals
 if st.button("Generate Story"):
     if user_input:
         client = AzureOpenAI(
@@ -35,7 +35,7 @@ if st.button("Generate Story"):
         # Function to interact with the OpenAI chat model
         response = client.chat.completions.create(
             model=model_name,
-            messages=[{"role": "user", "content": f"Generate a 10-word story with the keyword {user_input}"}]
+            messages=[{"role": "user", "content": f"Generate a 10-word story with the Kanji character {user_input} and its radicals"}]
         )
         assistant_response = response.choices[0].message.content
 
@@ -44,7 +44,6 @@ if st.button("Generate Story"):
 
             # Clear other elements in the UI
             st.text("")  # Add an empty text element to separate story from other content
-
 
 # Clear chat history button
 if st.button("Clear Chat"):
