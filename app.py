@@ -15,8 +15,8 @@ user_input = st.text_input("Kanji:", "")
 # Model selection dropdown
 selected_model = st.selectbox("Select Model:", ["gpt-35-turbo", "gpt-35-turbo-16k", "text-embedding-ada-002"])
 
-# Generate a 10-word story with words related to the provided Kanji character
-if st.button("Generate Story"):
+# Send message button
+if st.button("Send"):
     if user_input:
         client = AzureOpenAI(
             azure_endpoint=azure_endpoint,
@@ -24,20 +24,23 @@ if st.button("Generate Story"):
             api_version=api_version
         )
 
+        # Choose the appropriate model based on user selection
+        if selected_model == "gpt-35-turbo":
+            model_name = "GPT35TURBO"
+        elif selected_model == "gpt-35-turbo-16k":
+            model_name = "GPT35TURBO16K"
+        elif selected_model == "text-embedding-ada-002":
+            model_name = "ADA"
+
         # Function to interact with the OpenAI chat model
         response = client.chat.completions.create(
-            model=selected_model,
-            messages=[{"role": "user", "content": f"Generate a 10-word story with the Kanji characters '{user_input}' in English"}]
+            model=model_name,
+            messages=[{"role": "user", "content": user_input}]
         )
         assistant_response = response.choices[0].message.content
 
         if assistant_response:
-
-            # Display the generated story
-            st.write(f"Story: {assistant_response}")
-
-            # Clear other elements in the UI
-            st.text("")  # Add an empty text element to separate the story from other content
+            st.write(f"Assistant: {assistant_response}")
 
 # Clear chat history button
 if st.button("Clear Chat"):
