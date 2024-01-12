@@ -16,15 +16,6 @@ user_input = st.text_input("Kanji:", "")
 # Model selection dropdown
 selected_model = st.selectbox("Select Model:", ["gpt-35-turbo", "gpt-35-turbo-16k", "text-embedding-ada-002"])
 
-# Function to get radicals of a Kanji character
-def get_radicals(character):
-    lookup = CharacterLookup('T')
-    try:
-        radicals = lookup.getGraphicalVariantSet(character, 'kTotalStrokes')
-        return ', '.join(radicals)
-    except:
-        return character
-
 # Generate a 10-word story with words related to the provided Kanji character
 if st.button("Generate Story"):
     if user_input:
@@ -33,7 +24,12 @@ if st.button("Generate Story"):
             api_key=api_key,
             api_version=api_version
         )
-        
+
+        # Fetch radicals using cjklib
+        lookup = CharacterLookup('C')
+        radicals = lookup.getRadicalStrokeCount(user_input)
+        radicals_str = ', '.join(radicals) if radicals else user_input
+
         # Choose the appropriate model based on user selection
         if selected_model == "gpt-35-turbo":
             model_name = "GPT35TURBO"
@@ -42,17 +38,15 @@ if st.button("Generate Story"):
         elif selected_model == "text-embedding-ada-002":
             model_name = "ADA"
 
-        # Get radicals of the Kanji character
-        kanji_with_radicals = get_radicals(user_input)
-
         # Function to interact with the OpenAI chat model
         response = client.chat.completions.create(
             model=model_name,
-            messages=[{"role": "user", "content": f"Generate a 10-word story with the Kanji characters '{kanji_with_radicals}' in English"}]
+            messages=[{"role": "user", "content": f"Generate a 10-word story with the Kanji characters '{user_input}' in English"}]
         )
         assistant_response = response.choices[0].message.content
 
         if assistant_response:
+            st.write(f"Radicals: {radicals_str}")
             st.write(f"Story: {assistant_response}")
 
             # Clear other elements in the UI
