@@ -15,8 +15,8 @@ user_input = st.text_input("You:", "")
 # Model selection dropdown
 selected_model = st.selectbox("Select Model:", ["gpt-35-turbo", "gpt-35-turbo-16k", "text-embedding-ada-002"])
 
-# Send message button
-if st.button("Send"):
+# Generate a 10-word story with the specified keyword
+if st.button("Generate Story"):
     if user_input:
         client = AzureOpenAI(
             azure_endpoint=azure_endpoint,
@@ -35,14 +35,15 @@ if st.button("Send"):
         # Function to interact with the OpenAI chat model
         response = client.chat.completions.create(
             model=model_name,
-            messages=[{"role": "user", "content": user_input}]
+            messages=[{"role": "user", "content": f"Generate a 10-word story with the keyword {user_input}"}]
         )
         assistant_response = response.choices[0].message.content
 
         if assistant_response:
-            st.write(f"Assistant: {assistant_response}")
+            st.write(f"Story: {assistant_response}")
+
+
 
 # Clear chat history button
 if st.button("Clear Chat"):
     st.text("Chat cleared.")
-
