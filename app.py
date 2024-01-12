@@ -1,5 +1,6 @@
 import streamlit as st
 from openai import AzureOpenAI
+from cjklib.characterlookup import CharacterLookup
 
 # Replace with your provided Azure OpenAI credentials
 azure_endpoint = "https://sunhackathon31.openai.azure.com/"
@@ -15,7 +16,16 @@ user_input = st.text_input("Kanji:", "")
 # Model selection dropdown
 selected_model = st.selectbox("Select Model:", ["gpt-35-turbo", "gpt-35-turbo-16k", "text-embedding-ada-002"])
 
-# Generate a 10-word story with words related to the provided Kanji character and its radicals
+# Function to get radicals of a Kanji character
+def get_radicals(character):
+    lookup = CharacterLookup('T')
+    try:
+        radicals = lookup.getGraphicalVariantSet(character, 'kTotalStrokes')
+        return ', '.join(radicals)
+    except:
+        return character
+
+# Generate a 10-word story with words related to the provided Kanji character
 if st.button("Generate Story"):
     if user_input:
         client = AzureOpenAI(
@@ -32,10 +42,13 @@ if st.button("Generate Story"):
         elif selected_model == "text-embedding-ada-002":
             model_name = "ADA"
 
+        # Get radicals of the Kanji character
+        kanji_with_radicals = get_radicals(user_input)
+
         # Function to interact with the OpenAI chat model
         response = client.chat.completions.create(
             model=model_name,
-            messages=[{"role": "user", "content": f"Generate a 10-word story with the Kanji character {user_input} and its radicals"}]
+            messages=[{"role": "user", "content": f"Generate a 10-word story with the Kanji characters '{kanji_with_radicals}' in English"}]
         )
         assistant_response = response.choices[0].message.content
 
