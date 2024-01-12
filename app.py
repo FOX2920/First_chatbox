@@ -35,7 +35,7 @@ if st.button("Generate Story"):
         # Function to interact with the OpenAI chat model
         response = client.chat.completions.create(
             model=model_name,
-            messages=[{"role": "user", "content": f"Generate a 10-word story with the keyword {user_input}"}]
+            messages=[{"role": "user", "content": f"Generate a 10-word english story with the keyword {user_input}"}]
         )
         assistant_response = response.choices[0].message.content
 
