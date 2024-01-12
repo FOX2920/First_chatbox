@@ -10,7 +10,7 @@ api_version = "2023-05-15"
 st.title("Azure OpenAI Chatbox")
 
 # User input for Kanji character
-user_input = st.text_input("Kanji:", "")
+user_input = st.text_input("You:", "")
 
 # Model selection dropdown
 selected_model = st.selectbox("Select Model:", ["gpt-35-turbo", "gpt-35-turbo-16k", "text-embedding-ada-002"])
