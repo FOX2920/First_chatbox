@@ -1,6 +1,6 @@
 import streamlit as st
 from openai import AzureOpenAI
-from kanjize import kanji2rad
+from pyjisho import JishoApi
 
 # Replace with your provided Azure OpenAI credentials
 azure_endpoint = "https://sunhackathon31.openai.azure.com/"
@@ -24,21 +24,15 @@ if st.button("Generate Story"):
             api_key=api_key,
             api_version=api_version
         )
-        
-        # Choose the appropriate model based on user selection
-        if selected_model == "gpt-35-turbo":
-            model_name = "GPT35TURBO"
-        elif selected_model == "gpt-35-turbo-16k":
-            model_name = "GPT35TURBO16K"
-        elif selected_model == "text-embedding-ada-002":
-            model_name = "ADA"
 
-        # Get radicals of the Kanji character using kanjize
-        radicals = kanji2rad(user_input)
+        # Get radicals of the Kanji character using pyjisho
+        api = JishoApi()
+        kanji_info = api.search_kanji(user_input)
+        radicals = ", ".join(kanji_info["radicals"]) if kanji_info.get("radicals") else user_input
 
         # Function to interact with the OpenAI chat model
         response = client.chat.completions.create(
-            model=model_name,
+            model=selected_model,
             messages=[{"role": "user", "content": f"Generate a 10-word story with the Kanji characters '{user_input}' in English"}]
         )
         assistant_response = response.choices[0].message.content
@@ -51,7 +45,7 @@ if st.button("Generate Story"):
             st.write(f"Story: {assistant_response}")
 
             # Clear other elements in the UI
-            st.text("")  # Add an empty text element to separate story from other content
+            st.text("")  # Add an empty text element to separate the story from other content
 
 # Clear chat history button
 if st.button("Clear Chat"):
