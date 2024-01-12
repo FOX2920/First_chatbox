@@ -1,6 +1,5 @@
 import streamlit as st
 from openai import AzureOpenAI
-from pyjisho import JishoApi
 
 # Replace with your provided Azure OpenAI credentials
 azure_endpoint = "https://sunhackathon31.openai.azure.com/"
@@ -25,11 +24,6 @@ if st.button("Generate Story"):
             api_version=api_version
         )
 
-        # Get radicals of the Kanji character using pyjisho
-        api = JishoApi()
-        kanji_info = api.search_kanji(user_input)
-        radicals = ", ".join(kanji_info["radicals"]) if kanji_info.get("radicals") else user_input
-
         # Function to interact with the OpenAI chat model
         response = client.chat.completions.create(
             model=selected_model,
@@ -38,8 +32,6 @@ if st.button("Generate Story"):
         assistant_response = response.choices[0].message.content
 
         if assistant_response:
-            # Display radicals (bộ thủ) of the Kanji character
-            st.write(f"Radicals: {radicals}")
 
             # Display the generated story
             st.write(f"Story: {assistant_response}")
